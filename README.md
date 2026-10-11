@@ -1,8 +1,12 @@
 # inicio de sesion 
 <img width="181" height="373" alt="image" src="https://github.com/user-attachments/assets/cce39191-2acc-4bf1-b8ce-ecd48baed5bc" />
+<img width="185" height="395" alt="image" src="https://github.com/user-attachments/assets/be6720b5-477a-4c25-9f7d-b224f8eb1efd" />
 
 # operando divisa y historial ( Usuario )
 <img width="959" height="539" alt="image" src="https://github.com/user-attachments/assets/5403fd10-8d8e-460f-ba9e-3cca8616c408" />
+<img width="181" height="374" alt="image" src="https://github.com/user-attachments/assets/0bec596b-4958-4c2f-b8ea-bf390ef5ede2" />
+<img width="178" height="371" alt="image" src="https://github.com/user-attachments/assets/ba5b2389-309a-46f1-9410-9ec8ca50cd73" />
+
 
 # vista panel de Auditoria 
 <img width="191" height="396" alt="image" src="https://github.com/user-attachments/assets/c7d6a8d4-6609-45be-8508-7a4d04e718ea" />
