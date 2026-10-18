@@ -17,7 +17,9 @@
 # logica 
 <img width="959" height="503" alt="image" src="https://github.com/user-attachments/assets/a44561ae-70df-40d2-9623-68913043186e" />
 <img width="959" height="505" alt="image" src="https://github.com/user-attachments/assets/bcbbc300-d7d7-43f4-af0a-8741b89b23d5" />
-# hardware 
+
+# hardware
+
 se implemento validacion de identidad mendiante la camara y desde el rol de admin al aceptar una compra vibra el celular.
 <img width="959" height="514" alt="image" src="https://github.com/user-attachments/assets/7eccb4a9-d860-4aec-8fab-d95158013d51" />
 <img width="182" height="392" alt="image" src="https://github.com/user-attachments/assets/eceec23d-9964-4115-8889-dad73323392c" />
