@@ -110,7 +110,7 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         _orderForm.value = _orderForm.value.copy(amountInput = amount, errorMessage = null, successMessage = null)
     }
 
-    fun submitOrder(currentUser: User): Boolean {
+    fun submitOrder(currentUser: User, context: android.content.Context? = null): Boolean {
         val form = _orderForm.value
         val amount = form.amountInput.toDoubleOrNull()
         if (amount == null || amount <= 0) {
@@ -129,11 +129,22 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         )
 
         return if (result.isSuccess) {
+            val isCompra = form.type == TransactionType.COMPRA
             _orderForm.value = form.copy(
                 amountInput = "",
                 errorMessage = null,
-                successMessage = "¡Orden de ${form.type.name.lowercase()} creada! Enviada a auditoría del Administrador."
+                successMessage = if (isCompra) {
+                    "¡Compra de $amount ${form.selectedCurrencyCode} realizada con éxito!"
+                } else {
+                    "¡Orden de venta de $amount ${form.selectedCurrencyCode} creada con éxito!"
+                }
             )
+
+            // HARDWARE: Disparar vibración del celular al momento de realizar una COMPRA EXITOSA
+            if (isCompra && context != null) {
+                com.example.desde_cero.util.HardwareHelper.triggerSuccessVibration(context)
+            }
+
             loadUserData(currentUser)
             true
         } else {
@@ -166,7 +177,8 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
         adminUser: User,
         approve: Boolean,
         simulatedRateAtTransition: Double? = null,
-        observation: String = ""
+        observation: String = "",
+        context: android.content.Context? = null
     ): Boolean {
         val rateAtTransition = simulatedRateAtTransition ?: currencyRepository.getCurrentRate(tx.currencyCode)
         val result = transactionRepository.auditTransaction(
@@ -184,6 +196,12 @@ class CurrencyViewModel(application: Application) : AndroidViewModel(application
             } else {
                 "Transacción ${tx.id} rechazada correctamente."
             }
+
+            // HARDWARE: Si se aprueba una COMPRA como EXITOSA, emitir vibración por hardware
+            if (approve && tx.type == TransactionType.COMPRA && context != null) {
+                com.example.desde_cero.util.HardwareHelper.triggerSuccessVibration(context)
+            }
+
             refreshData()
             true
         } else {

@@ -83,6 +83,7 @@ fun AdminAuditScreen(
     val auditMessage by currencyViewModel.auditMessage.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val context = androidx.compose.ui.platform.LocalContext.current
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CO")).apply { maximumFractionDigits = 0 } }
     val numberFormatter = remember { NumberFormat.getNumberInstance(Locale.US).apply { maximumFractionDigits = 2 } }
 
@@ -359,7 +360,8 @@ fun AdminAuditScreen(
                                     tx = tx,
                                     adminUser = admin,
                                     approve = true,
-                                    simulatedRateAtTransition = currentRate
+                                    simulatedRateAtTransition = currentRate,
+                                    context = context
                                 )
                             }
                         },

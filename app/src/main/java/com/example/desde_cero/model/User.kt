@@ -10,5 +10,7 @@ data class User(
     val fullName: String,
     val email: String,
     val password: String,
-    val role: UserRole = UserRole.USER
+    val role: UserRole = UserRole.USER,
+    val cedula: String = "",
+    val isCedulaVerified: Boolean = false
 )

@@ -22,21 +22,32 @@ class UserRepository(context: Context) {
                     fullName = "Auditor Financiero (Admin)",
                     email = "admin@divisas.com",
                     password = "admin",
-                    role = UserRole.ADMIN
+                    role = UserRole.ADMIN,
+                    cedula = "1098765432",
+                    isCedulaVerified = true
                 ),
                 User(
                     id = "user_01",
                     fullName = "Carlos Comprador (Trader)",
                     email = "usuario@divisas.com",
                     password = "user",
-                    role = UserRole.USER
+                    role = UserRole.USER,
+                    cedula = "1023456789",
+                    isCedulaVerified = true
                 )
             )
             saveUsers(initialUsers)
         }
     }
 
-    fun register(fullName: String, email: String, password: String, role: UserRole): Result<User> {
+    fun register(
+        fullName: String,
+        email: String,
+        password: String,
+        role: UserRole,
+        cedula: String = "",
+        isCedulaVerified: Boolean = false
+    ): Result<User> {
         val trimmedEmail = email.trim().lowercase()
         val users = getAllUsers().toMutableList()
 
@@ -49,12 +60,23 @@ class UserRepository(context: Context) {
             fullName = fullName.trim(),
             email = trimmedEmail,
             password = password,
-            role = role
+            role = role,
+            cedula = cedula.trim(),
+            isCedulaVerified = isCedulaVerified
         )
 
         users.add(newUser)
         saveUsers(users)
         return Result.success(newUser)
+    }
+
+    fun updateUser(updatedUser: User) {
+        val users = getAllUsers().toMutableList()
+        val index = users.indexOfFirst { it.id == updatedUser.id }
+        if (index != -1) {
+            users[index] = updatedUser
+            saveUsers(users)
+        }
     }
 
     fun login(email: String, password: String): Result<User> {
@@ -98,7 +120,9 @@ class UserRepository(context: Context) {
                         fullName = obj.getString("fullName"),
                         email = obj.getString("email"),
                         password = obj.getString("password"),
-                        role = role
+                        role = role,
+                        cedula = obj.optString("cedula", ""),
+                        isCedulaVerified = obj.optBoolean("isCedulaVerified", false)
                     )
                 )
             }
@@ -117,6 +141,8 @@ class UserRepository(context: Context) {
                 put("email", user.email)
                 put("password", user.password)
                 put("role", user.role.name)
+                put("cedula", user.cedula)
+                put("isCedulaVerified", user.isCedulaVerified)
             }
             jsonArray.put(obj)
         }

@@ -86,6 +86,7 @@ fun UserHomeScreen(
     val userTransactions by currencyViewModel.userTransactions.collectAsState()
     val marketState by currencyViewModel.marketServiceState.collectAsState()
 
+    val context = androidx.compose.ui.platform.LocalContext.current
     val currencyFormatter = remember { NumberFormat.getCurrencyInstance(Locale.forLanguageTag("es-CO")).apply { maximumFractionDigits = 0 } }
     val numberFormatter = remember { NumberFormat.getNumberInstance(Locale.US).apply { maximumFractionDigits = 2 } }
 
@@ -443,7 +444,7 @@ fun UserHomeScreen(
                     Button(
                         onClick = {
                             currentUser?.let { user ->
-                                currencyViewModel.submitOrder(user)
+                                currencyViewModel.submitOrder(user, context)
                             }
                         },
                         modifier = Modifier
@@ -461,9 +462,24 @@ fun UserHomeScreen(
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            text = if (orderForm.type == TransactionType.COMPRA) "Solicitar Compra de ${selectedCurrency.code}" else "Solicitar Venta de ${selectedCurrency.code}",
+                            text = if (orderForm.type == TransactionType.COMPRA) "Confirmar Compra de ${selectedCurrency.code}" else "Confirmar Venta de ${selectedCurrency.code}",
                             fontWeight = FontWeight.Bold
                         )
+                    }
+
+                    if (orderForm.type == TransactionType.COMPRA) {
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Text(
+                                text = "📳 El dispositivo vibrará al confirmar la compra exitosa",
+                                fontSize = 11.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     }
                 }
             }

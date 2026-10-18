@@ -1,6 +1,7 @@
 package com.example.desde_cero.viewmodel
 
 import android.app.Application
+import android.graphics.Bitmap
 import androidx.lifecycle.AndroidViewModel
 import com.example.desde_cero.model.User
 import com.example.desde_cero.model.UserRepository
@@ -15,7 +16,9 @@ data class LoginUiState(
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isSuccess: Boolean = false
+    val isSuccess: Boolean = false,
+    val isCameraVerified: Boolean = false,
+    val cameraVerificationBitmap: Bitmap? = null
 )
 
 data class RegisterUiState(
@@ -24,9 +27,13 @@ data class RegisterUiState(
     val password: String = "",
     val confirmPassword: String = "",
     val selectedRole: UserRole = UserRole.USER,
+    val cedula: String = "",
+    val isCedulaCaptured: Boolean = false,
+    val cedulaBitmap: Bitmap? = null,
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val successMessage: String? = null,
     val isSuccess: Boolean = false
 )
 
@@ -53,6 +60,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
 
     fun toggleLoginPasswordVisibility() {
         _loginState.value = _loginState.value.copy(isPasswordVisible = !_loginState.value.isPasswordVisible)
+    }
+
+    fun onLoginCameraVerified(bitmap: Bitmap) {
+        _loginState.value = _loginState.value.copy(
+            isCameraVerified = true,
+            cameraVerificationBitmap = bitmap,
+            errorMessage = null
+        )
     }
 
     fun fillDemoUser() {
@@ -104,6 +119,10 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         _registerState.value = _registerState.value.copy(email = email, errorMessage = null)
     }
 
+    fun onRegisterCedulaChange(cedula: String) {
+        _registerState.value = _registerState.value.copy(cedula = cedula, errorMessage = null)
+    }
+
     fun onRegisterPasswordChange(password: String) {
         _registerState.value = _registerState.value.copy(password = password, errorMessage = null)
     }
@@ -120,6 +139,18 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         _registerState.value = _registerState.value.copy(isPasswordVisible = !_registerState.value.isPasswordVisible)
     }
 
+    /**
+     * Guarda la imagen de la cédula capturada por la cámara y marca la verificación.
+     */
+    fun onCedulaPhotoCaptured(bitmap: Bitmap) {
+        _registerState.value = _registerState.value.copy(
+            isCedulaCaptured = true,
+            cedulaBitmap = bitmap,
+            errorMessage = null,
+            successMessage = "¡Cédula capturada y verificada con éxito!"
+        )
+    }
+
     fun register(): Boolean {
         val state = _registerState.value
         if (state.fullName.isBlank()) {
@@ -128,6 +159,14 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
         }
         if (state.email.isBlank() || !state.email.contains("@")) {
             _registerState.value = state.copy(errorMessage = "Por favor ingresa un correo electrónico válido.")
+            return false
+        }
+        if (state.cedula.isBlank() || state.cedula.length < 5) {
+            _registerState.value = state.copy(errorMessage = "Por favor ingresa un número de cédula válido.")
+            return false
+        }
+        if (!state.isCedulaCaptured) {
+            _registerState.value = state.copy(errorMessage = "Debes usar la cámara para verificar y capturar la cédula.")
             return false
         }
         if (state.password.length < 3) {
@@ -139,7 +178,15 @@ class AuthViewModel(application: Application) : AndroidViewModel(application) {
             return false
         }
 
-        val result = repository.register(state.fullName, state.email, state.password, state.selectedRole)
+        val result = repository.register(
+            fullName = state.fullName,
+            email = state.email,
+            password = state.password,
+            role = state.selectedRole,
+            cedula = state.cedula,
+            isCedulaVerified = true
+        )
+
         return if (result.isSuccess) {
             val registeredUser = result.getOrNull()
             repository.login(state.email, state.password)
